@@ -1,12 +1,27 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using GameFrameworkLibrary.Interfaces;
+using GameFrameworkLibrary.Models.Base;
+using GameFrameworkLibrary.Configuration;
+using GameFrameworkLibrary.Models.Environment;
 
 namespace GameFrameworkLibrary
 {
-    public class Creature
+    public class Creature : Models.Base.WorldObject, IHasPosition
+    {
+        public Position Position { get; private set; }
+        public int HitPoints { get; private set; }
+
+        private readonly List<AttackItem> _attackItems = new();
+        private readonly List<DefenceItem> _defenceItems = new();
+        private readonly ILogger _logger;
+
+        public Creature(string name, int health, int damage)
+        {
+            Name = name;
+            Health = health;
+            Damage = damage;
+        }
+
+        public Creature() { }
     {
         public string? Name { get; set; }
         public int Health { get; set; }
@@ -21,7 +36,7 @@ namespace GameFrameworkLibrary
         {
             Health -= damage;
         }
-        public void Loot(WorldObject worldObject)
+        public void Loot(Models.Base.WorldObject worldObject)
         {
             if (worldObject.Lootable)
             {

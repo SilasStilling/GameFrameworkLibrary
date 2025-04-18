@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+
+<Configuration>
+	<World>
+		<Width>20</Width>
+		<Height>15</Height>
+	</World>
+	<Game>
+		<Difficulty>Normal</Difficulty>
+	</Game>
+	<CreatureSettings>
+		<MaxAttackItems>3</MaxAttackItems>
+		<MaxDefenceItems>2</MaxDefenceItems>
+	</CreatureSettings>
+</Configuration>
