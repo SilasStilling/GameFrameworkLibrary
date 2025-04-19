@@ -1,5 +1,6 @@
 ﻿using GameFrameworkLibrary.Interfaces;
 using GameFrameworkLibrary.Models.Base;
+using GameFrameworkLibrary.Models.Creatures;
 using System.Diagnostics;
 
 namespace GameFrameworkLibrary.Models.Environment
