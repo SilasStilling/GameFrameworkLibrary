@@ -1,4 +1,5 @@
-﻿using System;
+﻿using GameFrameworkLibrary.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace GameFrameworkLibrary.Models.Base
 {
-    public abstract class DefenceItem : ItemBase
+    public abstract class DefenceItem : ItemBase, IDefenceSource
     {
         public int DamageReduction { get; }
         public int Durability { get; }

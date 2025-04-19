@@ -1,4 +1,5 @@
-﻿using System;
+﻿using GameFrameworkLibrary.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,16 +7,16 @@ using System.Threading.Tasks;
 
 namespace GameFrameworkLibrary.Models.Base
 {
-    public class AttackItem : ItemBase
+    public abstract class AttackItem : ItemBase, IDamageSource
     {
-        public int HitDamage { get; set; }
-        public int Range { get; set; }
-
+        public int BaseDamage { get; }
+        public int Range { get; }
         public WeaponType WeaponType { get; }
-        public AttackItem(string name, string? description, int hitDamage, int range, WeaponType weaponType) 
+
+        public AttackItem(string name, string description, int hitdamage, int range, WeaponType weaponType) 
             : base(name, description)
         {
-            HitDamage = hitDamage;
+            BaseDamage = hitdamage;
             Range = range;
             WeaponType = weaponType;
         }
@@ -25,7 +26,7 @@ namespace GameFrameworkLibrary.Models.Base
         /// </summary>
         /// <returns>A string representation of the weapon.</returns>
         public override string ToString() =>
-            $"{base.ToString()} (Dmg: {HitDamage}, Range: {Range}, Type: {WeaponType})";
+            $"{base.ToString()} (Dmg: {BaseDamage}, Range: {Range}, Type: {WeaponType})";
 
     }
 }

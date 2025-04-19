@@ -19,7 +19,7 @@ namespace GameFrameworkLibrary.Models.ItemObjects
         /// <param name="hitdamage">The damage dealt by the pistol.</param>
         /// <param name="range">The range of the pistol's attack.</param>
         /// <param name="description">An optional description of the pistol.</param>
-        public Pistol(string name, int hitdamage, int range, string? description)
+        public Pistol(string name, int hitdamage, int range, string description)
             : base(name, description, hitdamage, range, WeaponType.Pistol)
         {
         }
