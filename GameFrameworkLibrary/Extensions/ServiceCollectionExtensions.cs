@@ -15,7 +15,7 @@ namespace GameFrameworkLibrary.Extensions
             services.AddTransient<IInventory, InventoryService>();
 
             services.AddSingleton<ICreatureFactory, CreatureFactory>();
-            services.AddSingleton<IAttackItemFactory>, AttackItemFactory>();
+            services.AddSingleton<IAttackItemFactory, AttackItemFactory>();
 
             services.AddSingleton<IDefenceItemFactory, DefenceItemFactory>();
 

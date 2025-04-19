@@ -1,15 +1,25 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
-
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Configuration>
-	<World>
-		<Width>20</Width>
-		<Height>15</Height>
-	</World>
-	<Game>
-		<Difficulty>Normal</Difficulty>
-	</Game>
-	<CreatureSettings>
-		<MaxAttackItems>3</MaxAttackItems>
-		<MaxDefenceItems>2</MaxDefenceItems>
-	</CreatureSettings>
+	<!-- World settings -->
+	<WorldWidth>30</WorldWidth>
+	<WorldHeight>20</WorldHeight>
+	<GameLevel>Normal</GameLevel>
+
+	<!-- Logging configuration -->
+	<Logging>
+		<!-- Default Level -->
+		<GlobalSourceLevel>Information</GlobalSourceLevel>
+
+		<!-- Listeners -->
+		<Listeners>
+			<!-- Console Listener -->
+			<Listener type="Console" />
+
+			<!-- File listener -->
+			<Listener type="File">
+				<FilterLevel>Warning</FilterLevel>
+				<Path>game.log</Path>
+			</Listener>
+		</Listeners>
+	</Logging>
 </Configuration>

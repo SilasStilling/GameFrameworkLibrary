@@ -11,10 +11,10 @@ using GameFrameworkLibrary.Models.Base;
 
 namespace GameFrameworkLibrary.Configuration
 {
-    public class ConfigLoader
+    public class ConfigLoader 
     {
         private readonly XmlDocument _document = new();
-        public GameConfig Load(string xmlFile)
+        public (WorldSettings worldSettings, LoggerSettings loggingConfig) Load(string xmlFile)
         {
             // 1) Validate existence and load XML document
             if (!File.Exists(xmlFile))
@@ -26,20 +26,23 @@ namespace GameFrameworkLibrary.Configuration
             // 3) Grab the root <Configuration> element
             var root = _document.DocumentElement ?? throw new ConfigurationException("Invalid configuration file format");
 
-            // 4) Read the core game settings
-            var config = new GameConfig
+            // 4) Read the world settings
+            var worldSettings = new WorldSettings
             {
                 WorldWidth = ReadInt(root, "WorldWidth"),
                 WorldHeight = ReadInt(root, "WorldHeight"),
                 GameLevel = ReadEnum<GameLevel>(root, "GameLevel")
             };
 
-            // 5) Look for an optional <Logging> section and process it
+            // 5) Initialize an empty LoggerSettings to hold logging settings
+            var loggerSettings = new LoggerSettings();
+
+            // 6) Parse the optional <Logging> section if present
             var loggingElement = root.SelectSingleNode("Logging");
             if (loggingElement != null)
-                ParseLogging(loggingElement, config);
+                ParseLogging(loggingElement, loggerSettings);
 
-            return config;
+            return (worldSettings, loggerSettings);
         }
         /// <summary>
         /// Reads an integer child element and throws if missing or invalid.
@@ -68,7 +71,7 @@ namespace GameFrameworkLibrary.Configuration
         /// <summary>
         /// Parses the <Logging> section, filling in cfg.LogLevel and cfg.Listeners.
         /// </summary>
-        private static void ParseLogging(XmlNode loggingElement, GameConfig config)
+        private static void ParseLogging(XmlNode loggingElement, LoggerSettings config)
         {
             // 1) Read the <SourceLevel> element into cfg.LogLevel (if present)
             var globalSrcLvlNode = loggingElement.SelectSingleNode("GlobalSourceLevel");

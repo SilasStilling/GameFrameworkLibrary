@@ -6,11 +6,12 @@ using GameFrameworkLibrary.Logging;
 using Microsoft.Extensions.DependencyInjection;
 using System.Diagnostics;
 using GameFrameworkLibrary.Models.Environment;
+using GameFrameworkLibrary.Models.Factories;
 
 Console.WriteLine("Start");
 
 #region Initialize Framework
-var gameFramework = GameFramework.Start();
+var gameFramework = Framework.Start();
 var frameworkLog = gameFramework.GetRequiredService<ILogger>();
 frameworkLog.Log(TraceEventType.Information, LogType.Game, "GameFramework started.");
 
@@ -27,26 +28,28 @@ var enemy = creatureFactory.Create("Abe", new Position(5, 7), 50);
 #endregion
 
 #region Setup Items
-var pistol = attackItemFactory.Create(
+var pistol = attackItemFactory.CreatePistol(
     name: "9mm Pistol",
     hitdamage: 29,
     range: 20,
     description: "A standard 9mm pistol.");
 
-var rifle = attackItemFactory.Create(
+var rifle = attackItemFactory.CreateRifle(
     name: "M4 Carbine",
     hitdamage: 50,
     range: 100,
     description: "A standard M4 Carbine.");
 
-var helmet = defenceItemFactory.Create(
-    name: "Combat Helmet",
-    damageReduction: 10,
-    description: "A standard combat helmet.");
-var vest = defenceItemFactory.Create(
-    name: "Kevlar Vest",
-    damageReduction: 20,
-    description: "A standard kevlar vest.");
+//var helmet = defenceItemFactory.CreateHelmet(
+//    name: "Combat Helmet",
+//    damageReduction: 10,
+//    description: "A standard combat helmet.");
+//    int durability = 100;
+
+//var vest = defenceItemFactory.CreateChest(
+//    name: "Kevlar Vest",
+//    damageReduction: 20,
+//    description: "A standard kevlar vest.");
 
 var stone = new EnvironmentObject(
     name: "Stone",
