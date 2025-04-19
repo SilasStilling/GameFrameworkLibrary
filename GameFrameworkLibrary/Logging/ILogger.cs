@@ -23,6 +23,7 @@ namespace GameFrameworkLibrary.Interfaces
         void Log(
             TraceEventType level,
             LogType logType,
-            string message);
+            string message,
+            int offset = 1);
     }
 }

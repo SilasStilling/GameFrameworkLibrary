@@ -6,33 +6,40 @@ using GameFrameworkLibrary.Models.ItemObjects;
 using System.Diagnostics;
 using System.ComponentModel;
 using System.Runtime.Intrinsics.Arm;
+using GameFrameworkLibrary.Services;
+using GameFrameworkLibrary.Models;
+using GameFrameworkLibrary.Models.Creatures;
 
 namespace GameFrameworkLibrary.Models.Creatures
 {
-    public class Creature : Base.WorldObject, IHasPosition
+    public class Creature : Base.WorldObject, IHasPosition, ICombatStats
     {
         public Position Position { get; private set; }
         public int HitPoints { get; private set; }
 
-        private readonly List<AttackItem> _attackItems = new();
-        private readonly List<DefenceItem> _defenceItems = new();
-        private readonly ILogger _logger;
-        private readonly List<IUsable> _usables = new();
+        private readonly IDamageCalc _damageCalc;
+        private readonly IInventory _inventory;
 
-        public Creature(string name, string? description, int hitpoints, Position startPosition, ILogger logger)
+        private readonly ILogger _logger;
+
+        public Creature(string name, string? description, int hitpoints, Position startPosition, IInventory inventory, ILogger logger, IDamageCalc damageCalc) 
             : base(name, description)
         {
             HitPoints = hitpoints;
             Position = startPosition;
+            _inventory = inventory;
+            _damageCalc = damageCalc;
             _logger = logger;
         }
         public override string ToString() =>
             $"(HP: {HitPoints}, Position: {Position})";
 
+        public IEnumerable<IUsable> GetUsables() => _inventory.GetUsables();
+
 
         public void Attack(Creature target)
         {
-            int damage = TotalDamage();
+            int damage = _damageCalc.CalculateDamage(this, target);
 
             _logger.Log(
                 TraceEventType.Information,
@@ -44,7 +51,7 @@ namespace GameFrameworkLibrary.Models.Creatures
 
         public void ReceiveDamage(int hitdamage)
         {
-            int damageReduction = _defenceItems.Sum(i => i.DamageReduction);
+            int damageReduction = GetTotalDamageReduction();
             int trueDamage = Math.Max(0, hitdamage - damageReduction);
             HitPoints -= trueDamage;
 
@@ -110,94 +117,28 @@ namespace GameFrameworkLibrary.Models.Creatures
                     $"{Name} tried to loot {container.Name} but it is not lootable ");
                 return;
             }
+
             var loot = source.GetLoot();
-            EquipLoot(loot);
-            if (container is LootableObject)
+            _inventory.ProcessLoot(loot);
+
+            if (container is LootableObject) 
             {
-                world.RemoveObject(container);
+            world.RemoveObject(container);
                 _logger.Log(
                     TraceEventType.Information,
                     LogType.Inventory,
                     $"{Name} looted {container.Name} and removed it from the world");
             }
         }
-        private int TotalDamage()
-        {
-            return _attackItems.Count != 0
-            ? _attackItems.Sum(i => i.HitDamage)
-            : 10;
-        }
-        private void AddUsable(IUsable usable)
-        {
-            _usables.Add(usable);
-            _logger.Log(
-                TraceEventType.Information,
-                LogType.Inventory,
-                $"{Name} added usable item to backpack: {((ItemBase)usable).Name}");
-        }
 
-        private void EquipDefenceItem(DefenceItem item)
-        {
-            if (item is not DefenceItem defenceItem)
-            {
-                _logger.Log(
-                    TraceEventType.Warning,
-                    LogType.Inventory,
-                    $"{Name} tried to equip {item.Name} but it is not a defence item");
-                return;
-            }
-            _defenceItems.Add(defenceItem);
-            _logger.Log(
-                TraceEventType.Information,
-                LogType.Inventory,
-                $"{Name} equipped {defenceItem.Name}");
-        }
-        private void EquipAttackItem(AttackItem item)
-        {
-            if (item is not AttackItem attackItem)
-            {
-                _logger.Log(
-                    TraceEventType.Warning,
-                    LogType.Inventory,
-                    $"{Name} tried to equip {item.Name} but it is not an attack item");
-                return;
-            }
-            _attackItems.Add(attackItem);
-            _logger.Log(
-                TraceEventType.Information,
-                LogType.Inventory,
-                $"{Name} equipped {attackItem.Name}");
-        }
-        private void EquipSingleItem(ItemBase item)
-        {
-            switch (item)
-            {
-                case AttackItem attackItem:
-                    EquipAttackItem(attackItem);
-                    break;
+        ///<inheritdoc/>
+        public int GetTotalBaseDamage() => _inventory.GetTotalBaseDamage();
 
-                case DefenceItem defenceItem:
-                    EquipDefenceItem(defenceItem);
-                    break;
+        ///<inheritdoc/>
+        public int GetTotalDamageReduction() => _inventory.GetTotalDamageReduction();
 
-                case IUsable usable:
-                    AddUsable(usable);
-                    break;
+        public void EquipAttackItem(IDamageSource attackItem) => _inventory.EquipAttackItem(attackItem);
 
-                default:
-                    _logger.Log(
-                        TraceEventType.Warning,
-                        LogType.Inventory,
-                        $"{Name} ignored item '{item.Name}' – unsupported item type.");
-                    break;
-            }
-        }
-        private void EquipLoot(IEnumerable<ItemBase> loot)
-        {
-            foreach (var item in loot)
-            {
-                EquipSingleItem(item);
-            }
-        }
+        public void EquipDefenceItem(IDefenceSource defenceItem) => _inventory.EquipDefenceItem(defenceItem);
     }
 }
