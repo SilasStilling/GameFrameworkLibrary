@@ -11,6 +11,17 @@ using GameFrameworkLibrary.Models.Base;
 
 namespace GameFrameworkLibrary.Configuration
 {
+    /// <summary>
+    /// Thrown when an error is found in the configuration file.
+    /// </summary>
+    public class ConfigurationException : Exception
+    {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ConfigurationException"/> class with a specified error message.
+        /// </summary>
+        /// <param name="message">The message that describes the configuration error.</param>
+        public ConfigurationException(string message) : base(message) { }
+    }
     public class ConfigLoader 
     {
         private readonly XmlDocument _document = new();
@@ -55,17 +66,6 @@ namespace GameFrameworkLibrary.Configuration
                 throw new ConfigurationException($"Invalid integer for <{name}>: '{node.InnerText}'");
 
             return val;
-        }
-        /// <summary>
-        /// Thrown when an error is found in the configuration file.
-        /// </summary>
-        public class ConfigurationException : Exception
-        {
-            /// <summary>
-            /// Initializes a new instance of the <see cref="ConfigurationException"/> class with a specified error message.
-            /// </summary>
-            /// <param name="message">The message that describes the configuration error.</param>
-            public ConfigurationException(string message) : base(message) { }
         }
 
         /// <summary>
