@@ -1,4 +1,5 @@
-﻿using GameFrameworkLibrary.Interfaces;
+﻿using GameFrameworkLibrary.Configuration;
+using GameFrameworkLibrary.Interfaces;
 using GameFrameworkLibrary.Models.Base;
 using GameFrameworkLibrary.Models.Creatures;
 using System.Diagnostics;
@@ -29,17 +30,17 @@ namespace GameFrameworkLibrary.Models.Environment
         /// <param name="height">The height of the game world.</param>
         /// <param name="logger">The logger instance for logging actions and events.</param>
         /// <param name="level">The difficulty level of the game world (default is <see cref="GameLevel.Normal"/>).</param>
-        public World(int width, int height, ILogger logger, GameLevel level = GameLevel.Normal)
+        public World(WorldSettings settings, ILogger logger)
         {
-            WorldWidth = width;
-            WorldHeight = height;
-            GameLevel = level;
+            WorldWidth = settings.WorldWidth;
+            WorldHeight = settings.WorldHeight;
+            GameLevel = settings.GameLevel;
 
             _logger = logger;
             _logger.Log(
                 TraceEventType.Information,
                 LogType.World,
-                $"World created: {width}x{height}, Level={level}");
+                $"World created: {WorldWidth}x{WorldHeight}, Level={GameLevel}");
         }
 
         /// <summary>

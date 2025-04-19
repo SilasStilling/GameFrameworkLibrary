@@ -23,8 +23,8 @@ var defenceItemFactory = gameFramework.GetRequiredService<IDefenceItemFactory>()
 
 #region Setup World and Creatures
 var world = gameFramework.GetRequiredService<World>();
-var player = creatureFactory.Create("John Doe", new Position(2, 3), 100);
-var enemy = creatureFactory.Create("Abe", new Position(5, 7), 50);
+var player = creatureFactory.Create("John Doe", new Position(2, 2), 100, "The Main Player");
+var enemy = creatureFactory.Create("evil person", new Position(4, 4), 50, "Very dumb enemy");
 #endregion
 
 #region Setup Items
@@ -44,7 +44,7 @@ var rifle = attackItemFactory.CreateRifle(
 //    name: "Combat Helmet",
 //    damageReduction: 10,
 //    description: "A standard combat helmet.");
-//    int durability = 100;
+//int durability = 100;
 
 //var vest = defenceItemFactory.CreateChest(
 //    name: "Kevlar Vest",
@@ -58,7 +58,7 @@ var stone = new EnvironmentObject(
 #endregion
 
 #region Test Attack
-player.Attack(enemy);
+//player.Attack(enemy);
 
 
 #endregion
