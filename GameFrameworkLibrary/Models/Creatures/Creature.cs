@@ -2,7 +2,9 @@
 using GameFrameworkLibrary.Models.Base;
 using GameFrameworkLibrary.Configuration;
 using GameFrameworkLibrary.Models.Environment;
+using GameFrameworkLibrary.Models.ItemObjects;
 using System.Diagnostics;
+using System.ComponentModel;
 
 namespace GameFrameworkLibrary.Models.Creatures
 {
@@ -47,9 +49,34 @@ namespace GameFrameworkLibrary.Models.Creatures
         }
 
 
-        public void Loot(ILootable)
+        public void Loot(ILootable source, World world)
         {
-
+            if (source is not EnvironmentObject container || source is not (ItemObjects.Container or LootableObject))
+            {
+                _logger.Log(
+                    TraceEventType.Warning,
+                    LogType.Inventory,
+                   $"{Name} cannot loot this source");
+                return;
+            }
+            if (!container.IsLootable)
+            {
+                _logger.Log(
+                    TraceEventType.Warning,
+                    LogType.Inventory,
+                    $"{Name} tried to loot {container.Name} but it is not lootable ");
+                return;
+            }
+            var loot = source.GetLoot();
+            //EquipLoot(loot);
+            if (container is LootableObject) 
+            {
+                world.RemoveObject(container);
+                _logger.Log(
+                    TraceEventType.Information,
+                    LogType.Inventory,
+                    $"{Name} looted {container.Name} and removed it from the world");
+            }
         }
     }
 }

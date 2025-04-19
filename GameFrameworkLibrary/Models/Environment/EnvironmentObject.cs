@@ -12,7 +12,7 @@ namespace GameFrameworkLibrary.Models.Environment
     /// Represents an object in the game world with a position, lootable status, and removable status.
     /// Inherits common properties from the base WorldObject class.
     /// </summary>
-    public class WorldObject : Base.WorldObject, IHasPosition
+    public class EnvironmentObject : Base.WorldObject, IHasPosition
     {
         /// <summary>
         /// Gets or sets the position of the object in the game world.
@@ -28,14 +28,14 @@ namespace GameFrameworkLibrary.Models.Environment
         public bool IsRemovable { get; internal set; }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="WorldObject"/> class with the specified properties.
+        /// Initializes a new instance of the <see cref="EnvironmentObject"/> class with the specified properties.
         /// </summary>
         /// <param name="name">The name of the object.</param>
         /// <param name="description">The optional description of the object.</param>
         /// <param name="position">The position of the object in the game world.</param>
         /// <param name="isLootable">Indicates if the object is lootable (default is false).</param>
         /// <param name="isRemovable">Indicates if the object is removable (default is false).</param>
-        public WorldObject(string name, string? description, Position position, bool isLootable = false, bool isRemovable = false)
+        public EnvironmentObject(string name, string? description, Position position, bool isLootable = false, bool isRemovable = false)
     : base(name, description)
         {
             Position = position;

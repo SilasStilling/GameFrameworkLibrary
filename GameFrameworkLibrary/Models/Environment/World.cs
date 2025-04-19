@@ -20,7 +20,7 @@ namespace GameFrameworkLibrary.Models.Environment
 
         private readonly ILogger _logger;
         private readonly List<Creature> _creatures = new();
-        private readonly List<WorldObject> _objects = new();
+        private readonly List<EnvironmentObject> _objects = new();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="World"/> class with the specified dimensions, logger, and difficulty level.
@@ -78,7 +78,7 @@ namespace GameFrameworkLibrary.Models.Environment
         /// Adds a world object to the game world after validating its position.
         /// </summary>
         /// <param name="worldObject">The world object to add.</param>
-        public void AddObject(WorldObject worldObject)
+        public void AddObject(EnvironmentObject worldObject)
         {
             ValidatePosition(worldObject);
 
@@ -93,7 +93,7 @@ namespace GameFrameworkLibrary.Models.Environment
         /// Removes a world object from the game world if it is marked as removable.
         /// </summary>
         /// <param name="worldObject">The world object to remove.</param>
-        public void RemoveObject(WorldObject worldObject)
+        public void RemoveObject(EnvironmentObject worldObject)
         {
             if (worldObject.IsRemovable)
             {
@@ -113,7 +113,7 @@ namespace GameFrameworkLibrary.Models.Environment
         /// <summary>
         /// Returns all environment objects currently in the world.
         /// </summary>
-        /// <returns>An enumerable of <see cref="WorldObject"/> instances.</returns>
-        public IEnumerable<WorldObject> GetObjects() => _objects;
+        /// <returns>An enumerable of <see cref="EnvironmentObject"/> instances.</returns>
+        public IEnumerable<EnvironmentObject> GetObjects() => _objects;
     }
 }
