@@ -7,11 +7,18 @@ using System.Threading.Tasks;
 
 namespace GameFrameworkLibrary.Models.ItemObjects
 {
-    public class Helmet : DefenceItem
+    public class ConfigurableDefenceItem : DefenceItem
     {
-        public Helmet(string name, string? description, int damageReduction, int durability, EquipmentSlots slot)
+        public ConfigurableDefenceItem(
+            string name,
+            string description,
+            int damageReduction,
+            int durability,
+            EquipmentSlots slot)
             : base(name, description, damageReduction, durability, slot)
         {
         }
+
+
     }
 }

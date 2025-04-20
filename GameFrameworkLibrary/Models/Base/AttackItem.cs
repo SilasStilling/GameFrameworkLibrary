@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace GameFrameworkLibrary.Models.Base
 {
-    public abstract class AttackItem : ItemBase, IDamageSource
+    public abstract class AttackItem : ItemBase, IWeapon
     {
         public int BaseDamage { get; }
         public int Range { get; }

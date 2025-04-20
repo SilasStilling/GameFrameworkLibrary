@@ -12,23 +12,24 @@ namespace GameFrameworkLibrary.Models.ItemObjects
 {
     public class LootableObject : EnvironmentObject, ILootable
     {
-        private readonly ItemBase _itemInside;
+        private readonly IItem _itemInside;
         private readonly ILogger _logger;
 
-        public LootableObject(ItemBase item, Position position, ILogger logger)
-            : base(item.Name, item.Description, position, isLootable: true, isRemovable: true)
+        public LootableObject(IItem item, Position position, ILogger logger, bool isLootable = true)
+            : base(item.Name, item.Description, position, isRemovable: true)
         {
+            IsLootable = isLootable;
             _itemInside = item;
             _logger = logger;
         }
 
-        public IEnumerable<ItemBase> GetLoot() 
+        public IEnumerable<IItem> GetLoot() 
         {
             _logger.Log(
                 TraceEventType.Information,
                 LogType.Inventory,
                 $"Looted {_itemInside.Name} from {Name} at {Position}");
-            return new List<ItemBase> { _itemInside };
+            return new List<IItem> { _itemInside };
         }
         public override string ToString()
         {

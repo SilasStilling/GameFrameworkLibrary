@@ -12,24 +12,35 @@ namespace GameFrameworkLibrary.Models.Factories
 {
     internal class CreatureFactory : ICreatureFactory
     {
-        private readonly ILogger _logger;
+        private readonly IStatsService _statsService;
+        private readonly ICombatService _combatService;
+        private readonly IMovementService _movementService;
         private readonly IInventory _inventory;
-        private readonly IDamageCalc _damageCalc;
 
         public CreatureFactory(
-             ILogger logger,
-             IInventory inventory,
-             IDamageCalc damageCalc)
+            IStatsService statsService,
+            ICombatService combatService,
+            IMovementService movementService,
+            IInventory inventoryService)
         {
-            _logger = logger;
-            _inventory = inventory;
-            _damageCalc = damageCalc;
+            _statsService = statsService;
+            _combatService = combatService;
+            _movementService = movementService;
+            _inventory = inventoryService;
         }
 
         /// <inheritdoc/>
-        public Creature Create(string name, Position position, int hitpoints, string? description = null)
+        public Creature Create(string name, string description, int hitpoints, Position position)
         {
-            return new Creature(name, description, hitpoints, position, _inventory, _logger, _damageCalc);
+            return new Creature(
+                name,
+                description,
+                hitpoints,
+                position,
+                _statsService,
+                _combatService,
+                _movementService,
+                _inventory);
         }
     }
 }

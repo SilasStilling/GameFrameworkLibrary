@@ -12,25 +12,29 @@ namespace GameFrameworkLibrary.Models.ItemObjects
 {
     public class Container : EnvironmentObject, ILootable
     {
-        private readonly ILogger _logger;
-        private readonly List<ItemBase> _items = new();
+        public bool IsLootable { get; internal set; }
 
-        public Container(string name, string? description, Position position, ILogger logger, bool isLootable = true, bool isRemovable = false)
-            : base(name, description, position, isLootable, isRemovable)
+        private readonly List<IItem> _items = new();
+        private readonly ILogger _logger;
+
+        public Container(string name, string description, Position position, ILogger logger, bool isLootable = true, bool isRemovable = false)
+            : base(name, description, position, isRemovable)
         {
+            IsLootable = isLootable;
             _logger = logger;
         }
-        public void AddItem(ItemBase item)
+
+        public void AddItem(IItem item)
         {
             _items.Add(item);
 
             _logger.Log(
                 TraceEventType.Information,
                 LogType.Inventory,
-                $"Item {item.Name} has been added to {Name} at {Position}");
+                $"Item '{item.Name}' added to container '{Name}' at {Position}");
         }
 
-        public IEnumerable<ItemBase> GetLoot()
+        public IEnumerable<IItem> GetLoot()
         {
             var loot = _items.ToList();
             _items.Clear();
@@ -38,7 +42,8 @@ namespace GameFrameworkLibrary.Models.ItemObjects
             _logger.Log(
                 TraceEventType.Information,
                 LogType.Inventory,
-                $"Looted {loot.Count} items from {Name} at {Position}");
+                $"Loot retrieved from container '{Name}' at {Position}. Items: {loot.Count}");
+
             return loot;
         }
         public override string ToString()

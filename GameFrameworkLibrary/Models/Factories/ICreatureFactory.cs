@@ -10,6 +10,6 @@ namespace GameFrameworkLibrary.Models.Factories
 {
     public interface ICreatureFactory
     {
-        Creature Create(string name, Position position, int hitpoints, string? description = null);
+        Creature Create(string name, string description, int hitpoints, Position position);
     }
 }

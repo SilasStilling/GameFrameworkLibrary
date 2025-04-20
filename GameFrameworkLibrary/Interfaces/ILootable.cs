@@ -11,13 +11,15 @@ namespace GameFrameworkLibrary.Interfaces
     /// Defines a contract for objects that can provide loot in the game.
     /// Implementing classes must provide a method to retrieve a collection of items.
     /// </summary>
-    public interface ILootable
+    public interface ILootable : IWorldObject
     {
+
+        bool IsLootable { get; }
 
         /// <summary>
         /// Retrieves the loot associated with the object.
         /// </summary>
         /// <returns>An enumerable collection of items derived from <see cref="ItemBase"/>.</returns>
-        IEnumerable<ItemBase> GetLoot();
+        IEnumerable<IItem> GetLoot();
     }
 }

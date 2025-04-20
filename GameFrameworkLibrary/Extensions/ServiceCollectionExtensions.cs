@@ -11,13 +11,14 @@ namespace GameFrameworkLibrary.Extensions
         public static IServiceCollection AddGameFrameworkLibrary(this IServiceCollection services)
         {
             // Registered services here
+            services.AddSingleton<IStatsService, StatsService>();
+            services.AddSingleton<ICombatService, CombatService>();
+            services.AddSingleton<IMovementService, MovementService>();
             services.AddSingleton<IDamageCalc, DamageCalc>();
             services.AddTransient<IInventory, InventoryService>();
 
-            services.AddSingleton<ICreatureFactory, CreatureFactory>();
-            services.AddSingleton<IAttackItemFactory, AttackItemFactory>();
 
-            services.AddSingleton<IDefenceItemFactory, DefenceItemFactory>();
+            services.AddSingleton<ICreatureFactory, CreatureFactory>();
 
             // World
             services.AddSingleton<World>();

@@ -12,133 +12,72 @@ using GameFrameworkLibrary.Models.Creatures;
 
 namespace GameFrameworkLibrary.Models.Creatures
 {
-    public class Creature : Base.WorldObject, IHasPosition, ICombatStats
+    public class Creature : Base.WorldObject, ICreature
     {
         public Position Position { get; private set; }
         public int HitPoints { get; private set; }
 
-        private readonly IDamageCalc _damageCalc;
+        private readonly ICombatService _combatService;
+        private readonly IMovementService _movementService;
         private readonly IInventory _inventory;
+        private readonly IStatsService _statsService;
 
-        private readonly ILogger _logger;
 
-        public Creature(string name, string? description, int hitpoints, Position startPosition, IInventory inventory, ILogger logger, IDamageCalc damageCalc) 
+        public Creature(
+            string name,
+            string description,
+            int hitpoints,
+            Position startPosition,
+            IStatsService statsService,
+            ICombatService combatService,
+            IMovementService movementService,
+            IInventory inventory)
             : base(name, description)
         {
             HitPoints = hitpoints;
             Position = startPosition;
+            _statsService = statsService;
+            _combatService = combatService;
+            _movementService = movementService;
             _inventory = inventory;
-            _damageCalc = damageCalc;
-            _logger = logger;
-        }
-        public override string ToString() =>
-            $"(HP: {HitPoints}, Position: {Position})";
 
+        }
+
+        /// <inheritdoc />
+        public void Attack(ICreature target) => _combatService.Attack(this, target);
+
+        /// <inheritdoc />
+        public void AdjustHitPoints(int delta)
+        {
+            HitPoints = Math.Max(0, Math.Min(HitPoints + delta, int.MaxValue));
+        }
+
+        /// <inheritdoc />
+        public void Move(int deltaX, int deltaY, World world)
+            => Position = _movementService.Move(Position, deltaX, deltaY, world);
+
+        /// <inheritdoc />
         public IEnumerable<IUsable> GetUsables() => _inventory.GetUsables();
 
+        /// <inheritdoc />
+        public void Loot(ILootable source, World world) => _inventory.Loot(this, source, world);
 
-        public void Attack(Creature target)
-        {
-            int damage = _damageCalc.CalculateDamage(this, target);
-
-            _logger.Log(
-                TraceEventType.Information,
-                LogType.Combat,
-                $"{Name} attacks {target.Name} for {damage} damage."
-            );
-            target.ReceiveDamage(damage);
-        }
-
-        public void ReceiveDamage(int hitdamage)
-        {
-            int damageReduction = GetTotalDamageReduction();
-            int trueDamage = Math.Max(0, hitdamage - damageReduction);
-            HitPoints -= trueDamage;
-
-            _logger.Log(
-                TraceEventType.Information,
-                LogType.Combat,
-                $"{Name} received {trueDamage} damage. Remaining HP: {HitPoints}");
-
-            if (HitPoints <= 0)
-            {
-                _logger.Log(
-                    TraceEventType.Critical,
-                    LogType.Combat,
-                    $"{Name} has been defeated.");
-            }
-        }
-        public void Move(int dx, int dy, World world)
-        {
-            var from = Position;
-            Position = Position with
-            {
-                X = Math.Clamp(Position.X + dx, 0, world.WorldWidth),
-                Y = Math.Clamp(Position.Y + dy, 0, world.WorldHeight)
-            };
-            _logger.Log(
-                TraceEventType.Information,
-                LogType.World,
-                $"{Name} attempted move from {from} to ({from.X + dx},{from.Y + dy}), clamped to {Position}");
-        }
-
-
-        public void UseItem(WorldObject item)
-        {
-            if (item is IUsable usable)
-            {
-                usable.UseOn(this);
-            }
-            else
-            {
-                _logger.Log(
-                    TraceEventType.Warning,
-                    LogType.Inventory,
-                    $"{Name} tried to use {item.Name} but it is not usable");
-            }
-        }
-
-
-        public void Loot(ILootable source, World world)
-        {
-            if (source is not EnvironmentObject container || source is not (ItemObjects.Container or LootableObject))
-            {
-                _logger.Log(
-                    TraceEventType.Warning,
-                    LogType.Inventory,
-                   $"{Name} cannot loot this source");
-                return;
-            }
-            if (!container.IsLootable)
-            {
-                _logger.Log(
-                    TraceEventType.Warning,
-                    LogType.Inventory,
-                    $"{Name} tried to loot {container.Name} but it is not lootable ");
-                return;
-            }
-
-            var loot = source.GetLoot();
-            _inventory.ProcessLoot(loot);
-
-            if (container is LootableObject) 
-            {
-            world.RemoveObject(container);
-                _logger.Log(
-                    TraceEventType.Information,
-                    LogType.Inventory,
-                    $"{Name} looted {container.Name} and removed it from the world");
-            }
-        }
+        /// <inheritdoc />
+        public void UseItem(IUsable item) => _inventory.UseItem(this, item);
 
         ///<inheritdoc/>
-        public int GetTotalBaseDamage() => _inventory.GetTotalBaseDamage();
+        public int GetTotalBaseDamage() => _statsService.GetTotalBaseDamage();
 
         ///<inheritdoc/>
-        public int GetTotalDamageReduction() => _inventory.GetTotalDamageReduction();
+        public int GetTotalDamageReduction() => _statsService.GetTotalBaseDamage();
 
+        ///<inheritdoc/>
         public void EquipAttackItem(IDamageSource attackItem) => _inventory.EquipAttackItem(attackItem);
 
+        ///<inheritdoc/>
         public void EquipDefenceItem(IDefenceSource defenceItem) => _inventory.EquipDefenceItem(defenceItem);
+
+        public override string ToString() =>
+            $"name {Name} position {Position} | ({HitPoints} HP)"; 
     }
 }

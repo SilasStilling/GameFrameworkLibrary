@@ -7,11 +7,14 @@ using System.Threading.Tasks;
 
 namespace GameFrameworkLibrary.Models.Base
 {
-    public abstract class DefenceItem : ItemBase, IDefenceSource
+    public abstract class DefenceItem : ItemBase, IArmor
     {
-        public int DamageReduction { get; }
-        public int Durability { get; }
+
         public EquipmentSlots Slot { get; }
+        public int DamageReduction { get; }
+        public int Durability { get; }          
+                  
+        EquipmentSlots IArmor.EquipmentSlot => Slot;
 
         public DefenceItem(string name, string? description, int damageReduction, int durability, EquipmentSlots slot)
             : base(name, description)

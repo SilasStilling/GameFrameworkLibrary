@@ -7,6 +7,9 @@ using System.Text;
 using System.Threading.Tasks;
 using GameFrameworkLibrary.Logging;
 using GameFrameworkLibrary.Models.Base;
+using GameFrameworkLibrary.Models.Creatures;
+using GameFrameworkLibrary.Models.Environment;
+using System.ComponentModel;
 
 
 namespace GameFrameworkLibrary.Services
@@ -16,7 +19,6 @@ namespace GameFrameworkLibrary.Services
         private readonly List<IDamageSource> _attackItems = new();
         private readonly List<IDefenceSource> _defenceItems = new();
         private readonly List<IUsable> _usables = new();
-
         private readonly ILogger _logger;
 
         public InventoryService(ILogger logger)
@@ -43,13 +45,45 @@ namespace GameFrameworkLibrary.Services
                 $"Equipped defence item: {((WorldObject)defenseSource).Name}");
         }
 
-        public int GetTotalBaseDamage() => _attackItems.Sum(item => item.BaseDamage);
+        /// <inheritdoc/>
+        public IEnumerable<IDamageSource> GetAttackItems() => _attackItems.AsReadOnly();
 
-        public int GetTotalDamageReduction() => _defenceItems.Sum(item => item.DamageReduction);
+        /// <inheritdoc/>
+        public IEnumerable<IDefenceSource> GetDefenceItems() => _defenceItems.AsReadOnly();
 
+        /// <inheritdoc/>
         public IEnumerable<IUsable> GetUsables() => _usables.AsReadOnly();
 
-        public void ProcessLoot(IEnumerable<WorldObject> loot)
+        public void Loot(ICreature looter, ILootable source, World world)
+        {
+            if (!source.IsLootable)
+            {
+                _logger.Log(TraceEventType.Information, LogType.Inventory,
+                    $"{looter.Name} tried to loot {source.Name}, but it's not lootable right now.");
+                return;
+            }
+
+            var items = source.GetLoot();
+            ProcessLoot(items);
+
+            if (source is EnvironmentObject)
+            {
+                world.RemoveObject((EnvironmentObject)source);
+                _logger.Log(TraceEventType.Information, LogType.Inventory,
+                    $"{source.Name} removed after looting.");
+            }
+        }
+
+        public void UseItem(ICreature user, IUsable item)
+        {
+            if (item is IUsable usable)
+                usable.UseOn(user);
+            else
+                _logger.Log(TraceEventType.Warning, LogType.Inventory,
+                    $"{item.Name} cannot be used by {user.Name}.");
+        }
+
+        public void ProcessLoot(IEnumerable<IItem> loot)
         {
             foreach (var item in loot)
             {
