@@ -8,6 +8,7 @@ using System.Xml.Serialization;
 using System.Xml;
 using System.Diagnostics;
 using GameFrameworkLibrary.Models.Base;
+using System.Xml.Linq;
 
 namespace GameFrameworkLibrary.Configuration
 {
@@ -24,7 +25,6 @@ namespace GameFrameworkLibrary.Configuration
     }
     public class ConfigLoader 
     {
-        private readonly XmlDocument _document = new();
         public (WorldSettings worldSettings, LoggerSettings loggingConfig) Load(string xmlFile)
         {
             // 1) Validate existence and load XML document
@@ -32,10 +32,11 @@ namespace GameFrameworkLibrary.Configuration
                 throw new FileNotFoundException($"Config file not found: {xmlFile}");
 
             // 2) Load the XML document
-            _document.Load(xmlFile);
+            var doc = XDocument.Load(xmlFile);
 
             // 3) Grab the root <Configuration> element
-            var root = _document.DocumentElement ?? throw new ConfigurationException("Invalid configuration file format");
+            var root = doc.Root
+                ?? throw new ConfigurationException("Invalid configuration file: missing <Configuration> root.");
 
             // 4) Read the world settings
             var worldSettings = new WorldSettings
@@ -49,82 +50,102 @@ namespace GameFrameworkLibrary.Configuration
             var loggerSettings = new LoggerSettings();
 
             // 6) Parse the optional <Logging> section if present
-            var loggingElement = root.SelectSingleNode("Logging");
-            if (loggingElement != null)
-                ParseLogging(loggingElement, loggerSettings);
+            if (root.Element("Logging") is XElement loggingRoot)
+            {
+                // Read optional <GlobalSourceLevel>
+                var globalLevel = loggingRoot.Element("GlobalSourceLevel");
+                if (globalLevel != null
+                    && Enum.TryParse<SourceLevels>(globalLevel.Value, out var gl))
+                {
+                    loggerSettings.LogLevel = gl;
+                }
+
+                ParseLogging(loggingRoot, loggerSettings);
+            }
 
             return (worldSettings, loggerSettings);
         }
-        /// <summary>
-        /// Reads an integer child element and throws if missing or invalid.
-        /// </summary>
-        private static int ReadInt(XmlElement root, string name)
-        {
-            var node = root[name] ?? throw new ConfigurationException($"Missing <{name}> in config");
 
-            if (!int.TryParse(node.InnerText, out int val))
-                throw new ConfigurationException($"Invalid integer for <{name}>: '{node.InnerText}'");
-
-            return val;
-        }
-
+        #region Methods
         /// <summary>
         /// Parses the <Logging> section, filling in cfg.LogLevel and cfg.Listeners.
         /// </summary>
-        private static void ParseLogging(XmlNode loggingElement, LoggerSettings config)
+        private static void ParseLogging(XElement loggingRoot, LoggerSettings config)
         {
-            // 1) Read the <SourceLevel> element into cfg.LogLevel (if present)
-            var globalSrcLvlNode = loggingElement.SelectSingleNode("GlobalSourceLevel");
-            if (globalSrcLvlNode != null && Enum.TryParse(globalSrcLvlNode.InnerText, out SourceLevels globalLvl))
-                config.LogLevel = globalLvl;
+            var container = loggingRoot.Elements("Listeners");
+            if (container == null)
+                return;
 
-            // 2) Find all <Listener> entries under <Listeners>
-            var listenerElements = loggingElement.SelectNodes("Listeners/Listener");
-            if (listenerElements == null) return;
+            // 1) Find all the <Listener> children
+            var listeners = container
+                .Elements("Listener")               // all <Listener> entries
 
-            // 3) For each Listener node, capture type and any custom settings
-            foreach (XmlNode ln in listenerElements)
+                // 2) Keep only those with a non-empty “type” attribute
+                .Where(x => !string.IsNullOrWhiteSpace((string?)x.Attribute("type")))
+
+                // 3) Turn each XElement into a ListenerConfig
+                .Select(x =>
+                {
+                    // read required type and set FilterLevel to default level from read file
+                    var cfg = new ListenerConfig
+                    {
+                        // a) required “type” attribute
+                        Type = (string)x.Attribute("type")!,
+                        FilterLevel = config.LogLevel,
+                    };
+
+                    // b) override level with optional <FilterLevel>
+                    if (Enum.TryParse<SourceLevels>((string?)x.Element("FilterLevel"), out var lvl))
+                        cfg.FilterLevel = lvl;
+
+                    // c) everything else → Settings dictionary
+                    cfg.Settings = x.Elements()
+                                       .Where(e => e.Name.LocalName != "FilterLevel")
+                                       .ToDictionary(
+                                            e => e.Name.LocalName,
+                                            e => e.Value
+                                       );
+                    return cfg;
+                })
+
+                // 4) Execute the query and collect results
+                .ToList();
+
+            // 5) If any were found, add them to our LoggerSettings
+            if (listeners.Count > 0)
             {
-                // a) Must have a type attribute
-                var typeAttr = ln.Attributes?["type"]?.Value;
-                if (string.IsNullOrWhiteSpace(typeAttr)) continue;
-
-                // b) Create a new ListenerConfig and populate its settings dictionary
-                var listener = new ListenerConfig { Type = typeAttr };
-
-                // c) Read any <FilterLevel> override
-                var filterNode = ln.SelectSingleNode("FilterLevel");
-                if (filterNode != null
-                    && Enum.TryParse(filterNode.InnerText, out SourceLevels filterLvl))
-                {
-                    listener.FilterLevel = filterLvl;
-                }
-
-                // d) Read the rest of the child settigns
-                foreach (XmlNode child in ln.ChildNodes)
-                {
-                    if (child.Name == "FilterLevel")
-                        continue;
-
-                    listener.Settings[child.Name] = child.InnerText;
-                }
-
-                // e) Add to the master list on GameConfig
-                config.Listeners.Add(listener);
+                config.Listeners.AddRange(listeners);
             }
         }
 
         /// <summary>
         /// Reads an enum child element of type T and throws if missing or invalid.
         /// </summary>
-        private static T ReadEnum<T>(XmlElement root, string name) where T : struct
+        private static T ReadEnum<T>(XElement root, string name) where T : struct
         {
-            var node = root[name] ?? throw new ConfigurationException($"Missing <{name}> in config");
+            var element = root.Element(name)
+                ?? throw new ConfigurationException($"Missing <{name}> in config");
 
-            if (!Enum.TryParse(node.InnerText, out T val))
-                throw new ConfigurationException($"Invalid enum value for <{name}>: '{node.InnerText}'");
+            if (!Enum.TryParse(element.Value, out T value))
+                throw new ConfigurationException($"Invalid enum value for <{name}>: '{element.Value}'");
 
-            return val;
+            return value;
         }
+
+        /// <summary>
+        /// Reads an integer child element and throws if missing or invalid.
+        /// </summary>
+        private static int ReadInt(XElement root, string name)
+        {
+            var element = root.Element(name)
+                ?? throw new ConfigurationException($"Missing <{name}> in config");
+
+            if (!int.TryParse(element.Value, out int value))
+                throw new ConfigurationException($"Invalid integer for <{name}>: '{element.Value}'");
+
+            return value;
+        }
+        #endregion
     }
 }
+
