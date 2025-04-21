@@ -9,37 +9,56 @@ using GameFrameworkLibrary.Configuration;
 using GameFrameworkLibrary.Extensions;
 using GameFrameworkLibrary.Logging;
 using GameFrameworkLibrary.Interfaces;
+using GameFrameworkLibrary.Models.Factories;
+using GameFrameworkLibrary.Services;
 
 namespace GameFrameworkLibrary.Models.Environment
 {
     public static class Framework
     {
-        public static ServiceProvider Start() 
+        public static ServiceProvider Start(string configFilePath, string traceSourceName)
         {
             var services = new ServiceCollection();
 
-            //cfg
-            var (loggerAdapter, worldsettings) = InitializeLoggingAndConfiguration();
+            // cfg
+            var (loggerAdapter, worldsettings) = InitializeLoggingAndConfiguration(configFilePath, traceSourceName);
 
-            // Services
-            services.AddGameFrameworkLibrary();
             services.AddSingleton<ILogger>(loggerAdapter);
             services.AddSingleton(worldsettings);
+
+            
+            services.AddGameFrameworkLibrary();
+
+            services.AddSingleton<IFactory<IUsable>>(sp =>
+            {
+                var combat = sp.GetRequiredService<ICombatService>();
+
+                var factory = new Factory<IUsable>();
+
+                return factory;
+            });
+
+            services.AddSingleton<IFactory<IWeapon>>(new Factory<IWeapon>());
+            services.AddSingleton<IFactory<IArmor>>(new Factory<IArmor>());
+            services.AddSingleton<IFactory<IUsable>>(new Factory<IUsable>());
 
             return services.BuildServiceProvider();
         }
 
-        private static (ILogger loggerAdapter, WorldSettings worldSettings) InitializeLoggingAndConfiguration() 
+
+        private static (ILogger loggerAdapter, WorldSettings worldSettings) InitializeLoggingAndConfiguration(
+            string configFilePath,
+            string traceSourceName)
         {
             var loader = new ConfigLoader();
-            var (worldSettings, loggerSettings) = loader.Load("config.xml");
+            var (worldSettings, loggerSettings) = loader.Load(configFilePath);
 
-            var trace = new TraceSource("GameFrameworkLibrary")
+            var trace = new TraceSource(traceSourceName)
             {
-                Switch = { Level = loggerSettings.LogLevel }
+                Switch = { Level = loggerSettings.LogLevel } // uses that global setting
             };
 
-            if (loggerSettings.Listeners.Count > 0) 
+            if (loggerSettings.Listeners.Count > 0)
             {
                 foreach (var ListenerConfig in loggerSettings.Listeners)
                 {
@@ -49,7 +68,8 @@ namespace GameFrameworkLibrary.Models.Environment
                         "File" when ListenerConfig.Settings.TryGetValue("Path", out var path) => new TextWriterTraceListener(path),
                         _ => throw new InvalidOperationException($"Unknown listener type '{ListenerConfig.Type}'")
                     };
-                    listener.Filter = new EventTypeFilter(loggerSettings.LogLevel);
+
+                    listener.Filter = new EventTypeFilter(ListenerConfig.FilterLevel);
                     trace.Listeners.Add(listener);
                 }
             }
@@ -57,6 +77,7 @@ namespace GameFrameworkLibrary.Models.Environment
             {
                 trace.Listeners.Add(new ConsoleTraceListener());
             }
+
             var loggerAdapter = new GameLoggerAdapter(trace);
 
             return (loggerAdapter, worldSettings);

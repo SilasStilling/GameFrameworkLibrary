@@ -11,12 +11,19 @@ using GameFrameworkLibrary.Models.Factories;
 Console.WriteLine("Start");
 
 #region Initialize Framework
-var gameFramework = Framework.Start();
-var frameworkLog = gameFramework.GetRequiredService<ILogger>();
-frameworkLog.Log(TraceEventType.Information, LogType.Game, "GameFramework started.");
+var gameFramework = Framework.Start("config.xml", "2DGameFramework");
 
-// Factories 
-var creatureFactory = gameFramework.GetRequiredService<ICreatureFactory>();
+// Services
+var logger              = gameFramework.GetRequiredService<ILogger>();
+var creatureFactory     = gameFramework.GetRequiredService<ICreatureFactory>();
+
+// Generic factories
+var armorFactory        = gameFramework.GetRequiredService<IFactory<IArmor>>();
+var weaponFactory       = gameFramework.GetRequiredService<IFactory<IWeapon>>();
+var consumableFactory   = gameFramework.GetRequiredService<IFactory<IUsable>>();
+
+logger.Log(TraceEventType.Information, LogType.Game, "Demo starting...");
+
 #endregion
 
 #region Setup World and Creatures
