@@ -7,6 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using System.Diagnostics;
 using GameFrameworkLibrary.Models.Environment;
 using GameFrameworkLibrary.Models.Factories;
+using GameFrameworkLibrary.Models.ItemObjects;
 
 Console.WriteLine("Start");
 
@@ -26,34 +27,76 @@ logger.Log(TraceEventType.Information, LogType.Game, "Demo starting...");
 
 #endregion
 
+#region Setup Items
+// Weapons
+weaponFactory.Register("9mm Pistol", () => new ConfigurableAttackItem(
+    name: "9mm Pistol",
+    description: "A standard 9mm Pistol",
+    hitdamage: 39,
+    range: 21,
+    weaponType: WeaponType.Pistol));
+
+weaponFactory.Register("AR-15", () => new ConfigurableAttackItem(
+    name: "AR-15",
+    description: "A standard AR-15 riffle",
+    hitdamage: 50,
+    range: 200,
+    weaponType: WeaponType.AssaultRifle));
+
+weaponFactory.Register("M4A1", () => new ConfigurableAttackItem(
+    name: "M4A1",
+    description: "A standard M4A1 riffle",
+    hitdamage: 50,
+    range: 200,
+    weaponType: WeaponType.AssaultRifle));
+
+// Armor
+
+armorFactory.Register("Kevler Helmet", () => new ConfigurableDefenceItem(
+    name: "Kevler Helmet",
+    description: "A bulletproof  helmet that protects you from basic firearms",
+    damageReduction: 20,
+    durability: 100,
+    slot: EquipmentSlots.head));
+
+armorFactory.Register("Kevler Vest", () => new ConfigurableDefenceItem(
+    name: "Kevler Vest",
+    description: "A bulletproof  vest that protects you from basic firearms",
+    damageReduction: 20,
+    durability: 100,
+    slot: EquipmentSlots.torso));
+
+#endregion
+
 #region Setup World and Creatures
 var world = gameFramework.GetRequiredService<World>();
-//var player = creatureFactory.Create("John Doe", new Position(2, 2), 100, "The Main Player");
-//var enemy = creatureFactory.Create("evil person", new Position(4, 4), 50, "Very dumb enemy");
+
+var player = creatureFactory.Create("Player", "The Main Character", 100, new Position(1, 1));
+
+var enemy = creatureFactory.Create("Enemy", "The Main Enemy", 25, new Position(2, 2));
+
+var mmPistol = weaponFactory.Create("9mm Pistol");
+var m4A1 = weaponFactory.Create("M4A1");
+var kevlerHelmet = armorFactory.Create("Kevler Helmet");
+var kevlerVest = armorFactory.Create("Kevler Vest");
+
+world.AddCreature(player);
+world.AddCreature(enemy);
+
+world.AddObject(new LootableObject(m4A1, new Position(2, 3), logger));
+
 #endregion
 
-#region Setup Items
 
+#region Test World
 
-//var helmet = defenceItemFactory.CreateHelmet(
-//    name: "Combat Helmet",
-//    damageReduction: 10,
-//    description: "A standard combat helmet.");
-//int durability = 100;
+player.EquipAttackItem(mmPistol);
 
-//var vest = defenceItemFactory.CreateChest(
-//    name: "Kevlar Vest",
-//    damageReduction: 20,
-//    description: "A standard kevlar vest.");
+player.EquipDefenceItem(kevlerHelmet);
+player.EquipDefenceItem(kevlerVest);
+//player.Move(new Position(2, 2));
 
-var stone = new EnvironmentObject(
-    name: "Stone",
-    description: "A huge stone that blocks people from going this way.",
-    new Position(8, 1));
-#endregion
+player.Attack(enemy);
 
-#region Test Attack
-//player.Attack(enemy);
-
-
+Console.WriteLine(world);
 #endregion
