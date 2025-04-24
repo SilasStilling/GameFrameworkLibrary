@@ -10,16 +10,17 @@ namespace GameFrameworkLibrary.Interfaces
 {
     /// <summary>
     /// Defines a contract for logging messages with a specified severity level and log type.
+    /// This interface provides a standardized way to log events across the game framework.
     /// </summary>
     public interface ILogger
     {
-
         /// <summary>
-        /// Logs a message with the specified severity level and log type.
+        /// Logs a message with the specified severity level, log type, and optional offset.
         /// </summary>
         /// <param name="level">The severity level of the log (e.g., Information, Warning, Error).</param>
-        /// <param name="logType">The type of log (e.g., Debug, System, Game).</param>
+        /// <param name="logType">The category of the log (e.g., Game, Combat, Inventory).</param>
         /// <param name="message">The message to log.</param>
+        /// <param name="offset">An optional offset to adjust the log ID (default is 1).</param>
         void Log(
             TraceEventType level,
             LogType logType,

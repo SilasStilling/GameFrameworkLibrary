@@ -68,7 +68,7 @@ namespace GameFrameworkLibrary.Services
                 return;
             }
 
-            var items = source.GetLoot();
+            var items = source.GetLoot(looter);
             ProcessLoot(items);
 
             if (source is EnvironmentObject)

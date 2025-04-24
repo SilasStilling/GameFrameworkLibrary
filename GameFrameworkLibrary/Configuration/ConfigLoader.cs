@@ -12,22 +12,32 @@ using GameFrameworkLibrary.Enums;
 
 namespace GameFrameworkLibrary.Configuration
 {
-    public class ConfigLoader 
+    /// <summary>
+    /// The ConfigLoader class is responsible for loading and parsing configuration data
+    /// from an XML file. It extracts settings for the game world and logging system
+    /// and maps them to strongly-typed objects.
+    /// </summary>
+    public class ConfigLoader
     {
+        /// <summary>
+        /// Loads the configuration from the specified XML file and returns the parsed
+        /// world settings and logging configuration.
+        /// </summary>
+        /// <param name="xmlFile">The path to the XML configuration file.</param>
+        /// <returns>A tuple containing WorldSettings and LoggerSettings objects.</returns>
+        /// <exception cref="FileNotFoundException">Thrown if the XML file does not exist.</exception>
+        /// <exception cref="ConfigurationException">Thrown if the XML structure is invalid.</exception>
         public (WorldSettings worldSettings, LoggerSettings loggingConfig) Load(string xmlFile)
         {
-            // 1) Validate existence and load XML document
             if (!File.Exists(xmlFile))
                 throw new FileNotFoundException($"Config file not found: {xmlFile}");
 
-            // 2) Load the XML document
             var doc = XDocument.Load(xmlFile);
 
-            // 3) Grab the root <Configuration> element
             var root = doc.Root
                 ?? throw new ConfigurationException("Invalid configuration file: missing <Configuration> root.");
 
-            // 4) Read the world settings
+            // Parse world settings
             var worldSettings = new WorldSettings
             {
                 WorldWidth = ReadInt(root, "WorldWidth"),
@@ -35,13 +45,11 @@ namespace GameFrameworkLibrary.Configuration
                 GameLevel = ReadEnum<GameLevel>(root, "GameLevel")
             };
 
-            // 5) Initialize an empty LoggerSettings to hold logging settings
+            // Parse logging settings
             var loggerSettings = new LoggerSettings();
 
-            // 6) Parse the optional <Logging> section if present
             if (root.Element("Logging") is XElement loggingRoot)
             {
-                // Read optional <GlobalSourceLevel>
                 var globalLevel = loggingRoot.Element("GlobalSourceLevel");
                 if (globalLevel != null
                     && Enum.TryParse<SourceLevels>(globalLevel.Value, out var gl))
@@ -56,38 +64,32 @@ namespace GameFrameworkLibrary.Configuration
         }
 
         #region Methods
+
         /// <summary>
-        /// Parses the <Logging> section, filling in cfg.LogLevel and cfg.Listeners.
+        /// Parses the logging configuration from the XML and populates the LoggerSettings object.
         /// </summary>
+        /// <param name="loggingRoot">The root XML element for logging configuration.</param>
+        /// <param name="config">The LoggerSettings object to populate.</param>
         private static void ParseLogging(XElement loggingRoot, LoggerSettings config)
         {
             var container = loggingRoot.Elements("Listeners");
             if (container == null)
                 return;
 
-            // 1) Find all the <Listener> children
             var listeners = container
-                .Elements("Listener")               // all <Listener> entries
-
-                // 2) Keep only those with a non-empty “type” attribute
+                .Elements("Listener")
                 .Where(x => !string.IsNullOrWhiteSpace((string?)x.Attribute("type")))
-
-                // 3) Turn each XElement into a ListenerConfig
                 .Select(x =>
                 {
-                    // read required type and set FilterLevel to default level from read file
                     var cfg = new ListenerConfig
                     {
-                        // a) required “type” attribute
                         Type = (string)x.Attribute("type")!,
                         FilterLevel = config.LogLevel,
                     };
 
-                    // b) override level with optional <FilterLevel>
                     if (Enum.TryParse<SourceLevels>((string?)x.Element("FilterLevel"), out var lvl))
                         cfg.FilterLevel = lvl;
 
-                    // c) everything else → Settings dictionary
                     cfg.Settings = x.Elements()
                                        .Where(e => e.Name.LocalName != "FilterLevel")
                                        .ToDictionary(
@@ -96,11 +98,8 @@ namespace GameFrameworkLibrary.Configuration
                                        );
                     return cfg;
                 })
-
-                // 4) Execute the query and collect results
                 .ToList();
 
-            // 5) If any were found, add them to our LoggerSettings
             if (listeners.Count > 0)
             {
                 config.Listeners.AddRange(listeners);
@@ -108,8 +107,13 @@ namespace GameFrameworkLibrary.Configuration
         }
 
         /// <summary>
-        /// Reads an enum child element of type T and throws if missing or invalid.
+        /// Reads an enum value from the XML element and converts it to the specified type.
         /// </summary>
+        /// <typeparam name="T">The enum type to parse.</typeparam>
+        /// <param name="root">The root XML element.</param>
+        /// <param name="name">The name of the XML element to read.</param>
+        /// <returns>The parsed enum value.</returns>
+        /// <exception cref="ConfigurationException">Thrown if the element is missing or invalid.</exception>
         private static T ReadEnum<T>(XElement root, string name) where T : struct
         {
             var element = root.Element(name)
@@ -122,8 +126,12 @@ namespace GameFrameworkLibrary.Configuration
         }
 
         /// <summary>
-        /// Reads an integer child element and throws if missing or invalid.
+        /// Reads an integer value from the XML element.
         /// </summary>
+        /// <param name="root">The root XML element.</param>
+        /// <param name="name">The name of the XML element to read.</param>
+        /// <returns>The parsed integer value.</returns>
+        /// <exception cref="ConfigurationException">Thrown if the element is missing or invalid.</exception>
         private static int ReadInt(XElement root, string name)
         {
             var element = root.Element(name)
@@ -134,7 +142,7 @@ namespace GameFrameworkLibrary.Configuration
 
             return value;
         }
+
         #endregion
     }
 }
-

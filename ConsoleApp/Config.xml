@@ -1,26 +1,33 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Configuration>
 	<!-- World settings -->
+	<!-- Defines the width of the game world in units -->
 	<WorldWidth>35</WorldWidth>
+	<!-- Defines the height of the game world in units -->
 	<WorldHeight>25</WorldHeight>
+	<!-- Sets the difficulty level of the game (e.g., Easy, Normal, Hard) -->
 	<GameLevel>Normal</GameLevel>
 
 	<!-- Logging configuration -->
 	<Logging>
 		<!-- Default Level -->
+		<!-- Specifies the global logging level. Messages below this level will not be logged. -->
 		<GlobalSourceLevel>Information</GlobalSourceLevel>
 
 		<!-- Listeners -->
 		<Listeners>
-			<!-- Console Listener (inherits Information) -->
+			<!-- Console Listener -->
+			<!-- Logs messages to the console. Inherits the global logging level (Information). -->
 			<Listener type="Console" />
 
 			<!-- File Listener for all Information+ -->
+			<!-- Logs messages of level Information and above to a file named 'game-info.log'. -->
 			<Listener type="File">
 				<Path>game-info.log</Path>
 			</Listener>
 
 			<!-- File Listener for Warning+ only -->
+			<!-- Logs messages of level Warning and above to a separate file named 'game-warning.log'. -->
 			<Listener type="File">
 				<FilterLevel>Warning</FilterLevel>
 				<Path>game-warning.log</Path>

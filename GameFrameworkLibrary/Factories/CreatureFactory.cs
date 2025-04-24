@@ -11,6 +11,9 @@ using System.Threading.Tasks;
 
 namespace GameFrameworkLibrary.Factories
 {
+    /// <summary>
+    /// Factory class responsible for creating instances of creatures in the game.
+    /// </summary>
     internal class CreatureFactory : ICreatureFactory
     {
         private readonly IStatsService _statsService;
@@ -24,6 +27,12 @@ namespace GameFrameworkLibrary.Factories
         /// <summary>
         /// Initializes a new instance of the <see cref="CreatureFactory"/> class.
         /// </summary>
+        /// <param name="statsService">Service for managing creature stats.</param>
+        /// <param name="combatService">Service for handling combat logic.</param>
+        /// <param name="movementService">Service for managing movement logic.</param>
+        /// <param name="inventory">Service for managing creature inventory.</param>
+        /// <param name="healthObserver">Observer for monitoring health changes.</param>
+        /// <param name="deathObserver">Observer for monitoring death events.</param>
         public CreatureFactory(
             IStatsService statsService,
             ICombatService combatService,
@@ -40,9 +49,17 @@ namespace GameFrameworkLibrary.Factories
             _deathObserver = deathObserver;
         }
 
-        /// <inheritdoc/>
+        /// <summary>
+        /// Creates a new creature with the specified attributes and subscribes it to the death observer.
+        /// </summary>
+        /// <param name="name">The name of the creature.</param>
+        /// <param name="description">A description of the creature.</param>
+        /// <param name="hitpoints">The initial hit points of the creature.</param>
+        /// <param name="position">The starting position of the creature in the game world.</param>
+        /// <returns>A new instance of <see cref="Creature"/>.</returns>
         public Creature Create(string name, string description, int hitpoints, Position position)
         {
+            // Create a new DefaultCreature instance with the provided attributes and services.
             var creature = new DefaultCreature(
                 name,
                 description,
@@ -53,6 +70,7 @@ namespace GameFrameworkLibrary.Factories
                 _movementService,
                 _inventory);
 
+            // Subscribe the creature to the death observer to handle death-related events.
             _deathObserver.Subscribe(creature);
 
             return creature;

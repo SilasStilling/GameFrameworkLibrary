@@ -54,7 +54,7 @@ namespace GameFrameworkLibrary
 
             var trace = new TraceSource(traceSourceName)
             {
-                Switch = { Level = loggerSettings.LogLevel } // uses that global setting
+                Switch = { Level = loggerSettings.LogLevel } 
             };
 
             if (loggerSettings.Listeners.Count > 0)

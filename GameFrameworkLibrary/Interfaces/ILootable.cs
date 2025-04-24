@@ -8,18 +8,21 @@ using System.Threading.Tasks;
 namespace GameFrameworkLibrary.Interfaces
 {
     /// <summary>
-    /// Defines a contract for objects that can provide loot in the game.
-    /// Implementing classes must provide a method to retrieve a collection of items.
+    /// Represents an object in the game that can provide loot.
+    /// This interface defines the contract for objects that can be looted by creatures.
     /// </summary>
     public interface ILootable : IWorldObject
     {
-
+        /// <summary>
+        /// Indicates whether the object can be looted.
+        /// </summary>
         bool IsLootable { get; }
 
         /// <summary>
         /// Retrieves the loot associated with the object.
         /// </summary>
-        /// <returns>An enumerable collection of items derived from <see cref="ItemBase"/>.</returns>
-        IEnumerable<IItem> GetLoot();
+        /// <param name="looter">The creature performing the looting.</param>
+        /// <returns>An enumerable collection of items derived from <see cref="IItem"/>.</returns>
+        IEnumerable<IItem> GetLoot(ICreature looter);
     }
 }

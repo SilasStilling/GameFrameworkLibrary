@@ -32,7 +32,7 @@ namespace GameFrameworkLibrary.Models.ItemObjects
                 $"Item '{item.Name}' added to container '{Name}' at {Position}");
         }
 
-        public IEnumerable<IItem> GetLoot()
+        public IEnumerable<IItem> GetLoot(ICreature looter)
         {
             var loot = _items.ToList();
             _items.Clear();
@@ -40,7 +40,7 @@ namespace GameFrameworkLibrary.Models.ItemObjects
             _logger.Log(
                 TraceEventType.Information,
                 LogType.Inventory,
-                $"Loot retrieved from container '{Name}' at {Position}. Items: {loot.Count}");
+                $"{looter.Name} looted {loot.Count} items from container '{Name}' at {Position}.");
 
             return loot;
         }
@@ -52,5 +52,8 @@ namespace GameFrameworkLibrary.Models.ItemObjects
 
             return $"{base.ToString()} [Items: {_items.Count}] [{itemList}]";
         }
+
+        public IEnumerable<IItem> PeekLoot() => _items.AsReadOnly();
+
     }
 }

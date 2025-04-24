@@ -23,13 +23,14 @@ namespace GameFrameworkLibrary.Models.ItemObjects
             _logger = logger;
         }
 
-        public IEnumerable<IItem> GetLoot() 
+        public IEnumerable<IItem> GetLoot(ICreature looter)
         {
             _logger.Log(
                 TraceEventType.Information,
                 LogType.Inventory,
-                $"Looted {_itemInside.Name} from {Name} at {Position}");
-            return new List<IItem> { _itemInside };
+                $"{looter.Name} looted '{_itemInside.Name}' from wrapper at {Position}");
+
+            return new[] { _itemInside };
         }
         public override string ToString()
         {
