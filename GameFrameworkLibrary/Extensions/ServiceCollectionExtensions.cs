@@ -2,7 +2,8 @@
 using GameFrameworkLibrary.Models.Environment;
 using GameFrameworkLibrary.Services;
 using Microsoft.Extensions.DependencyInjection;
-using GameFrameworkLibrary.Models.Factories;
+using GameFrameworkLibrary.Factories;
+using GameFrameworkLibrary.Interfaces;
 
 namespace GameFrameworkLibrary.Extensions
 {

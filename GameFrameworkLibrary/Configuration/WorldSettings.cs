@@ -1,4 +1,4 @@
-﻿using GameFrameworkLibrary.Models.Base;
+﻿using GameFrameworkLibrary.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;

@@ -1,11 +1,12 @@
-﻿using GameFrameworkLibrary.Models.Base;
+﻿using GameFrameworkLibrary.Enums;
+using GameFrameworkLibrary.Models.Items.Base;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace GameFrameworkLibrary.Models.ItemObjects
+namespace GameFrameworkLibrary.Models.Items.Defaults
 {
     public class ConfigurableDefenceItem : DefenceItem
     {

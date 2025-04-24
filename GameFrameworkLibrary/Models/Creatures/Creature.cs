@@ -1,5 +1,4 @@
 ﻿using GameFrameworkLibrary.Interfaces;
-using GameFrameworkLibrary.Models.Base;
 using GameFrameworkLibrary.Configuration;
 using GameFrameworkLibrary.Models.Environment;
 using GameFrameworkLibrary.Models.ItemObjects;
@@ -8,20 +7,24 @@ using System.ComponentModel;
 using System.Runtime.Intrinsics.Arm;
 using GameFrameworkLibrary.Services;
 using GameFrameworkLibrary.Models;
-using GameFrameworkLibrary.Models.Creatures;
+using GameFrameworkLibrary.Models.Combat;
 
 namespace GameFrameworkLibrary.Models.Creatures
 {
-    public class Creature : Base.WorldObject, ICreature
+    public class Creature : WorldObject, ICreature
     {
         public Position Position { get; private set; }
         public int HitPoints { get; private set; }
 
+        public IInventory Inventory => _inventory;
+
+
+
         private readonly ICombatService _combatService;
         private readonly IMovementService _movementService;
-        private readonly IInventory _inventory;
         private readonly IStatsService _statsService;
 
+        protected readonly Dictionary<string, IAttackAction> _namedActions = new();
 
         public Creature(
             string name,
@@ -40,6 +43,7 @@ namespace GameFrameworkLibrary.Models.Creatures
             _combatService = combatService;
             _movementService = movementService;
             _inventory = inventory;
+
 
         }
 

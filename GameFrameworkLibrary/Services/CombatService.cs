@@ -1,5 +1,4 @@
 ﻿using GameFrameworkLibrary.Interfaces;
-using GameFrameworkLibrary.Models.Creatures;
 using System;
 using System.Collections.Generic;
 using System.Linq;

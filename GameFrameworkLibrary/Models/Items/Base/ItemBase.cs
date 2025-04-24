@@ -1,10 +1,11 @@
-﻿using System;
+﻿using GameFrameworkLibrary.Models.Environment;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace GameFrameworkLibrary.Models.Base
+namespace GameFrameworkLibrary.Models.Items.Base
 {
     /// <summary>
     /// Represents a base class for items in the game world, inheriting common properties 

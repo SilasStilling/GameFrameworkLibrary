@@ -7,7 +7,6 @@ using System.Text;
 using System.Threading.Tasks;
 using GameFrameworkLibrary.Logging;
 using GameFrameworkLibrary.Models.Base;
-using GameFrameworkLibrary.Models.Creatures;
 using GameFrameworkLibrary.Models.Environment;
 using System.ComponentModel;
 

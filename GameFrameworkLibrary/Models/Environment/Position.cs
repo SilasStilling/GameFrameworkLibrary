@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace GameFrameworkLibrary.Models.Base
+namespace GameFrameworkLibrary.Models.Environment
 {
     /// <summary>
     /// Represents an immutable 2D position with X and Y coordinates.

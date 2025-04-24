@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using GameFrameworkLibrary.Models.Creatures;
+using GameFrameworkLibrary.Services;
 
-namespace GameFrameworkLibrary.Services
+namespace GameFrameworkLibrary.Interfaces
 {
     public interface IDamageCalc
     {

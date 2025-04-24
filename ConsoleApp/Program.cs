@@ -6,8 +6,10 @@ using GameFrameworkLibrary.Logging;
 using Microsoft.Extensions.DependencyInjection;
 using System.Diagnostics;
 using GameFrameworkLibrary.Models.Environment;
-using GameFrameworkLibrary.Models.Factories;
 using GameFrameworkLibrary.Models.ItemObjects;
+using GameFrameworkLibrary.Enums;
+using GameFrameworkLibrary.Factories;
+using GameFrameworkLibrary;
 
 Console.WriteLine("Start");
 

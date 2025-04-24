@@ -1,5 +1,4 @@
 ﻿using GameFrameworkLibrary.Interfaces;
-using GameFrameworkLibrary.Models.Base;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,7 +11,7 @@ namespace GameFrameworkLibrary.Models.Environment
     /// Represents an object in the game world with a position, lootable status, and removable status.
     /// Inherits common properties from the base WorldObject class.
     /// </summary>
-    public class EnvironmentObject : Base.WorldObject, IHasPosition
+    public class EnvironmentObject : WorldObject, IHasPosition
     {
         /// <summary>
         /// Gets or sets the position of the object in the game world.

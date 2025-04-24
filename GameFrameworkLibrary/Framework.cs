@@ -9,10 +9,9 @@ using GameFrameworkLibrary.Configuration;
 using GameFrameworkLibrary.Extensions;
 using GameFrameworkLibrary.Logging;
 using GameFrameworkLibrary.Interfaces;
-using GameFrameworkLibrary.Models.Factories;
-using GameFrameworkLibrary.Services;
+using GameFrameworkLibrary.Factories;
 
-namespace GameFrameworkLibrary.Models.Environment
+namespace GameFrameworkLibrary
 {
     public static class Framework
     {
@@ -23,7 +22,7 @@ namespace GameFrameworkLibrary.Models.Environment
             // cfg
             var (loggerAdapter, worldsettings) = InitializeLoggingAndConfiguration(configFilePath, traceSourceName);
 
-            services.AddSingleton<ILogger>(loggerAdapter);
+            services.AddSingleton(loggerAdapter);
             services.AddSingleton(worldsettings);
 
             

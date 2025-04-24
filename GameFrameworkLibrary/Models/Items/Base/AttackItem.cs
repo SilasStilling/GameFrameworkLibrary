@@ -1,11 +1,12 @@
-﻿using GameFrameworkLibrary.Interfaces;
+﻿using GameFrameworkLibrary.Enums;
+using GameFrameworkLibrary.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace GameFrameworkLibrary.Models.Base
+namespace GameFrameworkLibrary.Models.Items.Base
 {
     public abstract class AttackItem : ItemBase, IWeapon
     {

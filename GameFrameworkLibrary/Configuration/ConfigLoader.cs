@@ -7,22 +7,11 @@ using System.IO;
 using System.Xml.Serialization;
 using System.Xml;
 using System.Diagnostics;
-using GameFrameworkLibrary.Models.Base;
 using System.Xml.Linq;
+using GameFrameworkLibrary.Enums;
 
 namespace GameFrameworkLibrary.Configuration
 {
-    /// <summary>
-    /// Thrown when an error is found in the configuration file.
-    /// </summary>
-    public class ConfigurationException : Exception
-    {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ConfigurationException"/> class with a specified error message.
-        /// </summary>
-        /// <param name="message">The message that describes the configuration error.</param>
-        public ConfigurationException(string message) : base(message) { }
-    }
     public class ConfigLoader 
     {
         public (WorldSettings worldSettings, LoggerSettings loggingConfig) Load(string xmlFile)

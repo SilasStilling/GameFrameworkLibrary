@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace GameFrameworkLibrary.Models.Base
+namespace GameFrameworkLibrary.Models.Environment
 {
     /// <summary>
     /// Represents a base class for objects within the game world, 

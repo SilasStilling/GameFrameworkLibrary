@@ -1,12 +1,11 @@
-﻿using GameFrameworkLibrary.Models.Base;
-using GameFrameworkLibrary.Models.Environment;
+﻿using GameFrameworkLibrary.Models.Environment;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace GameFrameworkLibrary.Services
+namespace GameFrameworkLibrary.Interfaces
 {
     public interface IMovementService
     {

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace GameFrameworkLibrary.Models.Creatures
+namespace GameFrameworkLibrary.Services
 {
     /// <summary>
     /// Provides total attack and defense power for a creature.

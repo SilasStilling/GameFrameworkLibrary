@@ -1,4 +1,4 @@
-﻿using GameFrameworkLibrary.Models.Base;
+﻿using GameFrameworkLibrary.Interfaces;
 using GameFrameworkLibrary.Models.Environment;
 using System;
 using System.Collections.Generic;

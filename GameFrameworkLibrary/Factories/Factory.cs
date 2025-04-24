@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace GameFrameworkLibrary.Models.Factories
+namespace GameFrameworkLibrary.Factories
 {
     public interface IFactory<T>
     {

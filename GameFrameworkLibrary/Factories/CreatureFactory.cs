@@ -1,6 +1,6 @@
 ﻿using GameFrameworkLibrary.Interfaces;
-using GameFrameworkLibrary.Models.Base;
 using GameFrameworkLibrary.Models.Creatures;
+using GameFrameworkLibrary.Models.Environment;
 using GameFrameworkLibrary.Services;
 using System;
 using System.Collections.Generic;
@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace GameFrameworkLibrary.Models.Factories
+namespace GameFrameworkLibrary.Factories
 {
     internal class CreatureFactory : ICreatureFactory
     {

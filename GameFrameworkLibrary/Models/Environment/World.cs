@@ -1,4 +1,5 @@
 ﻿using GameFrameworkLibrary.Configuration;
+using GameFrameworkLibrary.Enums;
 using GameFrameworkLibrary.Interfaces;
 using GameFrameworkLibrary.Models.Base;
 using GameFrameworkLibrary.Models.Creatures;

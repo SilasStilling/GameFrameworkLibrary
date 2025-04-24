@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace GameFrameworkLibrary.Models.Base
+namespace GameFrameworkLibrary.Enums
 {
     public enum WeaponType
     {
