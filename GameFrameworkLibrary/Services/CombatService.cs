@@ -54,5 +54,16 @@ namespace GameFrameworkLibrary.Services
             }
         }
 
+        /// <inheritdoc />
+        public void AttackWithSource(ICreature attacker, ICreature target, IDamageSource source)
+        {
+            int damage = source.BaseDamage;
+
+            _logger.Log(TraceEventType.Information, LogType.Combat,
+                $"{attacker.Name} uses {source} against {target.Name}, dealing {damage} damage");
+
+            ReceiveDamage(target, damage);
+        }
+
     }
 }

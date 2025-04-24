@@ -16,13 +16,13 @@ namespace GameFrameworkLibrary.Interfaces
 
         void EquipAttackItem(IDamageSource attackItem);
 
-        void EquipDefenseItem(IDefenceSource defenseItem);
+        void EquipDefenceItem(IDefenceSource defenseItem);
 
         void ProcessLoot(IEnumerable<IItem> loot);
 
         IEnumerable<IDamageSource> GetAttackItems();
 
-        IEnumerable<IDefenceSource> GetDefenseItems();
+        IEnumerable<IDefenceSource> GetDefenceItems();
 
         void Loot(ICreature looter, ILootable source, World world);
         IEnumerable<IItem> RemoveAllItems(ICreature creature);

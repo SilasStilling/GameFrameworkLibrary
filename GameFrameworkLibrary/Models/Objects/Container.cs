@@ -12,8 +12,6 @@ namespace GameFrameworkLibrary.Models.ItemObjects
 {
     public class Container : EnvironmentObject, ILootable
     {
-        public bool IsLootable { get; internal set; }
-
         private readonly List<IItem> _items = new();
         private readonly ILogger _logger;
 

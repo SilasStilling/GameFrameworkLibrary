@@ -9,6 +9,6 @@ namespace GameFrameworkLibrary.Interfaces
 {
     public interface IMovementService
     {
-        Position Move(Position current, int dx, int dy, World world);
+        Position Move(ICreature mover, Position current, int dx, int dy, World world);
     }
 }

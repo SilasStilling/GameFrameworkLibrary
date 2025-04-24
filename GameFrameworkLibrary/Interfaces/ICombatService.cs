@@ -12,5 +12,6 @@ namespace GameFrameworkLibrary.Interfaces
 
         void ReceiveDamage(ICreature creature, int damage);
 
+        void AttackWithSource(ICreature attacker, ICreature target, IDamageSource source);
     }
 }

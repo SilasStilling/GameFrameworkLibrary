@@ -21,7 +21,7 @@ namespace GameFrameworkLibrary.Models.Environment
         public GameLevel GameLevel { get; }
 
         private readonly ILogger _logger;
-        private readonly List<Creature> _creatures = new();
+        private readonly List<ICreature> _creatures = new();
         private readonly List<EnvironmentObject> _objects = new();
 
         /// <summary>
@@ -57,6 +57,13 @@ namespace GameFrameworkLibrary.Models.Environment
                 TraceEventType.Information,
                 LogType.World,
                 $"Creature '{creature.Name}' added at {creature.Position}");
+        }
+
+        public void RemoveCreature(ICreature creature)
+        {
+            _creatures.Remove(creature);
+            _logger.Log(TraceEventType.Information, LogType.World,
+            $"Creature '{creature.Name}' removed from world.");
         }
 
         /// <summary>
@@ -110,7 +117,7 @@ namespace GameFrameworkLibrary.Models.Environment
         /// Returns all creatures currently in the world.
         /// </summary>
         /// <returns>An enumerable of <see cref="Creature"/> instances.</returns>
-        public IEnumerable<Creature> GetCreatures() => _creatures;
+        public IEnumerable<ICreature> GetCreatures() => _creatures;
 
         /// <summary>
         /// Returns all environment objects currently in the world.

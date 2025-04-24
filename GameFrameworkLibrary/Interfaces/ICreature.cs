@@ -1,4 +1,6 @@
-﻿using GameFrameworkLibrary.Models.Environment;
+﻿using GameFrameworkLibrary.Models.Combat;
+using GameFrameworkLibrary.Models.Creatures;
+using GameFrameworkLibrary.Models.Environment;
 using GameFrameworkLibrary.Services;
 using System;
 using System.Collections.Generic;
@@ -13,10 +15,18 @@ namespace GameFrameworkLibrary.Interfaces
         string Name { get; }
         int HitPoints { get; }
 
+
+        event EventHandler<DeathEventArgs>? OnDeath;
+        event EventHandler<HealthChangedEventArgs>? HealthChanged;
+
+
         void Move(int deltaX, int deltaY, World world);
 
-        void Attack(ICreature target);
+        void RegisterAttackAction(string key, IAttackAction action);
+
+        void Attack(string actionKey, ICreature target);
 
         void AdjustHitPoints(int delta);
+
     }
 }

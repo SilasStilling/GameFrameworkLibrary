@@ -1,4 +1,5 @@
 ﻿using GameFrameworkLibrary.Interfaces;
+using GameFrameworkLibrary.Models.Base;
 using GameFrameworkLibrary.Models.Creatures;
 using GameFrameworkLibrary.Services;
 using System;
@@ -23,9 +24,6 @@ namespace GameFrameworkLibrary.Observers
             _logger = logger;
             _inventory = inventory;
         }
-
-
-        /// <summary>Subscribe a single creature’s HealthChanged event.</summary>
         public void Subscribe(ICreature creature, double thresholdFraction)
         {
             // clamp threshold between 0 and 1
@@ -38,27 +36,12 @@ namespace GameFrameworkLibrary.Observers
         {
             if (sender is not ICreature creature) return;
 
-            // skip if not in our map or already dead
+            // Skip if not in our map or already dead
             if (!_thresholds.TryGetValue(creature, out var thresholdFraction)) return;
             if (e.NewHp <= 0) return;
 
-            int thresholdHitPoints = (int)(creature.MaxHitPoints * thresholdFraction);
-
-            if (e.OldHp > thresholdHitPoints && e.NewHp <= thresholdHitPoints)
-            {
-                var healingItem = creature
-                    .GetUsables()
-                    .FirstOrDefault(u => (u.Type & ConsumableType.Healing) != 0);
-
-                if (healingItem != null)
-                {
-                    _inventory.UseItem(creature, healingItem);
-
-                    _logger.Log(TraceEventType.Information, LogCategory.Combat,
-                        $"{creature.Name} auto‑used {healingItem.Name} at {creature.HitPoints}/{creature.MaxHitPoints} HP.");
-                }
-            }
+            // Log the health change
+            _logger.Log(TraceEventType.Information, LogType.Combat, $"{creature.Name} health changed to {e.NewHp}");
         }
     }
-
 }

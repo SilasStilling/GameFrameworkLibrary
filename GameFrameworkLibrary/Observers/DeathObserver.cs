@@ -1,4 +1,5 @@
 ﻿using GameFrameworkLibrary.Interfaces;
+using GameFrameworkLibrary.Models.Base;
 using GameFrameworkLibrary.Models.Creatures;
 using GameFrameworkLibrary.Services;
 using System;
@@ -7,16 +8,18 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using GameFrameworkLibrary.Models.Environment;
+using GameFrameworkLibrary.Models.ItemObjects;
 
 namespace GameFrameworkLibrary.Observers
 {
     public class DeathObserver
     {
-        private readonly GameWorld _world;
+        private readonly World _world;
         private readonly ILogger _logger;
-        private readonly IInventoryService _inventory;
+        private readonly IInventory _inventory;
 
-        public DeathObserver(IEnumerable<Creature> creatures, GameWorld world, ILogger logger, IInventoryService inventory)
+        public DeathObserver(IEnumerable<Creature> creatures, World world, ILogger logger, IInventory inventory)
         {
             _world = world;
             _logger = logger;
@@ -39,7 +42,7 @@ namespace GameFrameworkLibrary.Observers
             // 1) Unsubscribe to observer
             dead.OnDeath -= HandleDeath;
 
-            _logger.Log(TraceEventType.Information, LogCategory.Inventory,
+            _logger.Log(TraceEventType.Information, LogType.Inventory,
                         $"Spawning corpse for {dead.Name}.");
 
             // 2) Create corpse

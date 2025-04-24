@@ -25,6 +25,12 @@ namespace GameFrameworkLibrary.Services
             _logger = logger;
         }
 
+        public void AddItem(IItem item)
+        {
+            if (item == null) throw new ArgumentNullException(nameof(item));
+            ProcessLoot(new[] { item });
+        }
+
         public void EquipAttackItem(IDamageSource attackItem)
         {
             _attackItems.Add(attackItem);
@@ -80,6 +86,21 @@ namespace GameFrameworkLibrary.Services
             else
                 _logger.Log(TraceEventType.Warning, LogType.Inventory,
                     $"{item.Name} cannot be used by {user.Name}.");
+        }
+
+        public IEnumerable<IItem> RemoveAllItems(ICreature creature)
+        {
+            var items = new List<IItem>();
+            items.AddRange(_attackItems.Cast<IItem>());
+            items.AddRange(_defenceItems.Cast<IItem>());
+
+            _attackItems.Clear();
+            _defenceItems.Clear();
+
+            _logger.Log(TraceEventType.Information, LogType.Inventory,
+                $"{creature.Name} dropped {items.Count} items on death.");
+
+            return items;
         }
 
         public void ProcessLoot(IEnumerable<IItem> loot)
