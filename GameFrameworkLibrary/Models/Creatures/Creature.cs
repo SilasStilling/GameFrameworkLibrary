@@ -11,18 +11,39 @@ using GameFrameworkLibrary.Models.Combat;
 
 namespace GameFrameworkLibrary.Models.Creatures
 {
+    /// <summary>
+    /// Represents a base class for creatures in the game world.
+    /// Provides core functionality for combat, movement, inventory management, and health tracking.
+    /// </summary>
     public abstract class Creature : WorldObject, ICreature
     {
+        /// <summary>
+        /// Gets or sets the current hit points of the creature.
+        /// </summary>
         public int HitPoints { get; internal set; }
+
+        /// <summary>
+        /// Gets the maximum hit points of the creature.
+        /// </summary>
         public int MaxHitPoints { get; }
+
+        /// <summary>
+        /// Gets or sets the current position of the creature in the game world.
+        /// </summary>
         public Position Position { get; internal set; }
+
+        /// <summary>
+        /// Gets the inventory of the creature.
+        /// </summary>
         public IInventory Inventory => _inventory;
 
+        // Services and dependencies
         protected readonly ICombatService _combatService;
         protected readonly IMovementService _movementService;
         protected readonly IInventory _inventory;
         protected readonly IStatsService _statsService;
 
+        // Dictionary to store registered attack actions
         protected readonly Dictionary<string, IAttackAction> _namedActions = new();
 
         /// <summary>
@@ -57,6 +78,7 @@ namespace GameFrameworkLibrary.Models.Creatures
         }
 
         #region Public Methods
+
         /// <summary>
         /// Registers an attack action under a unique key.
         /// CompositeAttackAction can itself wrap multiple actions.
@@ -68,7 +90,11 @@ namespace GameFrameworkLibrary.Models.Creatures
             _namedActions[key] = action;
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Executes an attack using a registered attack action.
+        /// </summary>
+        /// <param name="actionKey">The key of the attack action to execute.</param>
+        /// <param name="target">The target creature to attack.</param>
         public void Attack(string actionKey, ICreature target)
         {
             if (!_namedActions.TryGetValue(actionKey, out var action))
@@ -77,7 +103,10 @@ namespace GameFrameworkLibrary.Models.Creatures
             AttackTemplate(action, target);
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Adjusts the creature's hit points by the specified delta value.
+        /// </summary>
+        /// <param name="delta">The amount to adjust the hit points by (positive or negative).</param>
         public void AdjustHitPoints(int delta)
         {
             int oldHitPoints = HitPoints;
@@ -89,32 +118,57 @@ namespace GameFrameworkLibrary.Models.Creatures
                 OnDeath?.Invoke(this, new DeathEventArgs(this));
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Moves the creature by the specified delta values within the game world.
+        /// </summary>
+        /// <param name="deltaX">The change in the X-coordinate.</param>
+        /// <param name="deltaY">The change in the Y-coordinate.</param>
+        /// <param name="world">The game world where the movement occurs.</param>
         public void Move(int deltaX, int deltaY, World world)
             => Position = _movementService.Move(this, Position, deltaX, deltaY, world);
 
-
-        /// <inheritdoc />
+        /// <summary>
+        /// Loots items from a source and adds them to the creature's inventory.
+        /// </summary>
+        /// <param name="source">The lootable source.</param>
+        /// <param name="world">The game world where the looting occurs.</param>
         public void Loot(ILootable source, World world) => _inventory.Loot(this, source, world);
 
-
-        ///<inheritdoc/>
+        /// <summary>
+        /// Gets the total base damage of the creature from equipped attack items.
+        /// </summary>
         public int GetTotalBaseDamage() => _statsService.GetTotalBaseDamage();
 
-        ///<inheritdoc/>
+        /// <summary>
+        /// Gets the total damage reduction of the creature from equipped defense items.
+        /// </summary>
         public int GetTotalDamageReduction() => _statsService.GetTotalDamageReduction();
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Equips a weapon for the creature.
+        /// </summary>
+        /// <param name="weapon">The weapon to equip.</param>
         public void EquipWeapon(IDamageSource weapon) => _inventory.EquipAttackItem(weapon);
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Equips armor for the creature.
+        /// </summary>
+        /// <param name="armor">The armor to equip.</param>
         public void EquipArmor(IDefenceSource armor) => _inventory.EquipDefenceItem(armor);
 
+        /// <summary>
+        /// Returns a string representation of the creature, including its name, position, and health.
+        /// </summary>
         public override string ToString() =>
             $"{Name} at {Position} ({HitPoints}/{MaxHitPoints} HP)";
+
         #endregion
 
         #region Templates
+
+        /// <summary>
+        /// Template method for executing an attack action.
+        /// </summary>
         protected void AttackTemplate(IAttackAction action, ICreature target)
         {
             PreAttack(action, target);
@@ -122,21 +176,32 @@ namespace GameFrameworkLibrary.Models.Creatures
             PostAttack(action, target);
         }
 
-        protected virtual void PreAttack(IAttackAction action, ICreature target)
-        {
-            // e.g. throw if out of range, consume stamina, apply “first‑strike” buff
-        }
+        /// <summary>
+        /// Hook for pre-attack logic (e.g., range checks, buffs).
+        /// </summary>
+        protected virtual void PreAttack(IAttackAction action, ICreature target) { }
 
+        /// <summary>
+        /// Abstract method for performing the actual attack logic.
+        /// Must be implemented by derived classes.
+        /// </summary>
         protected abstract void DoAttack(IAttackAction action, ICreature target);
 
-        protected virtual void PostAttack(IAttackAction action, ICreature target)
-        {
-            // e.g. trigger OnHit observers, apply bleed effect, log damage summary
-        }
+        /// <summary>
+        /// Hook for post-attack logic (e.g., applying effects, logging).
+        /// </summary>
+        protected virtual void PostAttack(IAttackAction action, ICreature target) { }
+
         #endregion
+
+        /// <summary>
+        /// Event triggered when the creature's health changes.
+        /// </summary>
         public event EventHandler<HealthChangedEventArgs>? HealthChanged;
 
+        /// <summary>
+        /// Event triggered when the creature dies.
+        /// </summary>
         public event EventHandler<DeathEventArgs>? OnDeath;
     }
-
 }

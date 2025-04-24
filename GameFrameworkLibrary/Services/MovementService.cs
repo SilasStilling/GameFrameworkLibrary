@@ -10,16 +10,34 @@ using System.Threading.Tasks;
 
 namespace GameFrameworkLibrary.Services
 {
+    /// <summary>
+    /// Provides movement logic for creatures in the game world.
+    /// Ensures creatures move within the bounds of the game world and logs movement actions.
+    /// Implements the <see cref="IMovementService"/> interface.
+    /// </summary>
     public class MovementService : IMovementService
     {
         private readonly ILogger _logger;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MovementService"/> class.
+        /// </summary>
+        /// <param name="logger">The logger instance for logging movement actions.</param>
         public MovementService(ILogger logger)
         {
             _logger = logger;
         }
 
-        ///<inheritdoc/>
+        /// <summary>
+        /// Moves a creature to a new position based on the specified deltas.
+        /// Ensures the new position is clamped within the bounds of the game world.
+        /// </summary>
+        /// <param name="mover">The creature that is moving.</param>
+        /// <param name="current">The current position of the creature.</param>
+        /// <param name="dx">The change in the X-coordinate.</param>
+        /// <param name="dy">The change in the Y-coordinate.</param>
+        /// <param name="world">The game world where the movement occurs.</param>
+        /// <returns>The new position of the creature after movement.</returns>
         public Position Move(ICreature mover, Position current, int dx, int dy, World world)
         {
             // Capture origin and intended positions
@@ -32,7 +50,7 @@ namespace GameFrameworkLibrary.Services
                 Math.Clamp(intended.Y, 0, world.WorldHeight)
             );
 
-
+            // Determine log level based on whether clamping occurred
             var level = (intended != clamped)
                 ? TraceEventType.Warning
                 : TraceEventType.Information;

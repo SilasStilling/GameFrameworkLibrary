@@ -10,9 +10,13 @@ using GameFrameworkLibrary.Models.Base;
 using GameFrameworkLibrary.Models.Environment;
 using System.ComponentModel;
 
-
 namespace GameFrameworkLibrary.Services
 {
+    /// <summary>
+    /// Manages the inventory system for creatures in the game framework.
+    /// Handles adding, equipping, looting, using, and removing items.
+    /// Implements the <see cref="IInventory"/> interface.
+    /// </summary>
     public class InventoryService : IInventory
     {
         private readonly List<IDamageSource> _attackItems = new();
@@ -20,27 +24,42 @@ namespace GameFrameworkLibrary.Services
         private readonly List<IUsable> _usables = new();
         private readonly ILogger _logger;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="InventoryService"/> class.
+        /// </summary>
+        /// <param name="logger">The logger instance for logging inventory actions.</param>
         public InventoryService(ILogger logger)
         {
             _logger = logger;
         }
 
+        /// <summary>
+        /// Adds an item to the inventory and processes it based on its type.
+        /// </summary>
+        /// <param name="item">The item to add.</param>
         public void AddItem(IItem item)
         {
             if (item == null) throw new ArgumentNullException(nameof(item));
             ProcessLoot(new[] { item });
         }
 
+        /// <summary>
+        /// Equips an attack item (e.g., weapon) to the inventory.
+        /// </summary>
+        /// <param name="attackItem">The attack item to equip.</param>
         public void EquipAttackItem(IDamageSource attackItem)
         {
             _attackItems.Add(attackItem);
             _logger.Log(
                 TraceEventType.Information,
                 LogType.Inventory,
-
                 $"Equipped attack item: {((WorldObject)attackItem).Name}");
         }
 
+        /// <summary>
+        /// Equips a defense item (e.g., armor) to the inventory.
+        /// </summary>
+        /// <param name="defenseSource">The defense item to equip.</param>
         public void EquipDefenceItem(IDefenceSource defenseSource)
         {
             _defenceItems.Add(defenseSource);
@@ -59,6 +78,13 @@ namespace GameFrameworkLibrary.Services
         /// <inheritdoc/>
         public IEnumerable<IUsable> GetUsables() => _usables.AsReadOnly();
 
+        /// <summary>
+        /// Loots items from a lootable source and adds them to the inventory.
+        /// Removes the source from the world if it is an environment object.
+        /// </summary>
+        /// <param name="looter">The creature performing the looting.</param>
+        /// <param name="source">The lootable source.</param>
+        /// <param name="world">The game world where the looting occurs.</param>
         public void Loot(ICreature looter, ILootable source, World world)
         {
             if (!source.IsLootable)
@@ -79,6 +105,11 @@ namespace GameFrameworkLibrary.Services
             }
         }
 
+        /// <summary>
+        /// Uses a usable item on a creature.
+        /// </summary>
+        /// <param name="user">The creature using the item.</param>
+        /// <param name="item">The usable item to use.</param>
         public void UseItem(ICreature user, IUsable item)
         {
             if (item is IUsable usable)
@@ -88,6 +119,11 @@ namespace GameFrameworkLibrary.Services
                     $"{item.Name} cannot be used by {user.Name}.");
         }
 
+        /// <summary>
+        /// Removes all items from the inventory and returns them.
+        /// </summary>
+        /// <param name="creature">The creature whose inventory is being cleared.</param>
+        /// <returns>A collection of removed items.</returns>
         public IEnumerable<IItem> RemoveAllItems(ICreature creature)
         {
             var items = new List<IItem>();
@@ -103,6 +139,10 @@ namespace GameFrameworkLibrary.Services
             return items;
         }
 
+        /// <summary>
+        /// Processes a collection of loot items and categorizes them into attack items, defense items, or usables.
+        /// </summary>
+        /// <param name="loot">The collection of loot items to process.</param>
         public void ProcessLoot(IEnumerable<IItem> loot)
         {
             foreach (var item in loot)
